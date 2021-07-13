@@ -30,7 +30,7 @@ main(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(main_screen.size[0],
-			main_screen.size[1], "text-rendering", 0, 0);
+			main_screen.size[1], "multiple-shaders", 0, 0);
 	glfwMakeContextCurrent(window);
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);

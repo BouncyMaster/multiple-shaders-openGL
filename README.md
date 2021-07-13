@@ -1,3 +1,2 @@
-# text-rendering
-An example program written in C that loads a text font and shows it on the
-screen with openGL
+# multiple-shaders
+An example openGL program written in C that loads multiple shaders
