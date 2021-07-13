@@ -39,8 +39,8 @@ main(void)
 
 	struct text_rendering main_text;
 
-	char *vertex_source = file_to_str("shaders/vertex.glsl");
-	char *fragment_source = file_to_str("shaders/fragment.glsl");
+	char *vertex_source = file_to_str("shaders/text-rendering.vs");
+	char *fragment_source = file_to_str("shaders/text-rendering.fs");
 	text_rendering_init(
 		vertex_source, fragment_source,
 		"/usr/share/fonts/liberation-fonts/LiberationSans-Regular.ttf",
@@ -57,7 +57,7 @@ main(void)
 		glClearColor(.2, .3, .3, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		if (main_screen.perspective_changed) {
+		if(main_screen.perspective_changed) {
 			main_screen.perspective_changed = false;
 			text_rendering_perspective((float)main_screen.size[0], 
 					(float)main_screen.size[1], &main_text);
