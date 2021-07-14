@@ -59,8 +59,12 @@ main(void)
 
 		if(main_screen.perspective_changed) {
 			main_screen.perspective_changed = false;
-			text_rendering_perspective((float)main_screen.size[0], 
-					(float)main_screen.size[1], &main_text);
+
+			text_rendering_perspective(
+				(vec2){main_screen.size[0],
+					main_screen.size[1]},
+				&main_text
+			);
 		}
 
 		text_rendering_render("This is sample text", (vec2){25, 25}, 1,
