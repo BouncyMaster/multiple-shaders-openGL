@@ -37,7 +37,7 @@ text_rendering_init(const char *vertex_shader_source,
 
 	FT_Face face;
 	FT_New_Face(ft, font, 0, &face);
-	FT_Set_Pixel_Sizes(face, 0, 48);
+	FT_Set_Pixel_Sizes(face, 0, 24);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	unsigned int texture;

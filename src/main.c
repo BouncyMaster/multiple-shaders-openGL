@@ -10,26 +10,26 @@
 #include "text_rendering.h"
 #include "camera.h"
 
-unsigned int VAO, VBO, shader_program;
-float delta_time, last_frame = 0;
-float lastX = 400, lastY = 400; // scr_width / 2
-bool first_mouse = true, zoom_changed = true;
-struct camera main_camera;
+short screen_size[2] = {800, 800};
+bool screen_changed = true;
 
-struct screen {
-	short size[2];
-	bool screen_changed;
-} main_screen = {{800, 800}, true};
+unsigned int world_VAO, world_VBO, world_shader;
+
+float delta_time, last_frame = 0, top_time = 0;
+bool mouse_first = true, zoom_changed = true;
+float mouse_last[2] = {400, 400}; // screen_size / 2
+
+struct camera main_camera;
 
 void
 framebuffer_size_callback(GLFWwindow *window, int w, int h)
 {
 	glViewport(0, 0, w, h);
 
-	main_screen.screen_changed = true;
+	screen_changed = true;
 
-	main_screen.size[0] = w;
-	main_screen.size[1] = h;
+	screen_size[0] = w;
+	screen_size[1] = h;
 }
 
 void
@@ -37,6 +37,8 @@ keyboard_callback(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		top_time = 0;
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera_process_keyboard(FORWARD, delta_time,
@@ -55,16 +57,16 @@ keyboard_callback(GLFWwindow* window)
 void
 mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	if (first_mouse) {
-		lastX = xpos;
-		lastY = ypos;
-		first_mouse = false;
+	if (mouse_first) {
+		mouse_last[0] = xpos;
+		mouse_last[1] = ypos;
+		mouse_first = false;
 	}
 
-	vec2 offset = {xpos - lastX, lastY - ypos};
+	vec2 offset = {xpos - mouse_last[0], mouse_last[1] - ypos};
 
-	lastX = xpos;
-	lastY = ypos;
+	mouse_last[0] = xpos;
+	mouse_last[1] = ypos;
 
 	camera_process_mouse(offset, &main_camera);
 }
@@ -84,8 +86,8 @@ main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(main_screen.size[0],
-			main_screen.size[1], "multiple-shaders", 0, 0);
+	GLFWwindow* window = glfwCreateWindow(screen_size[0], screen_size[1],
+			"multiple-shaders", 0, 0);
 	glfwMakeContextCurrent(window);
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -95,11 +97,11 @@ main(void)
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &world_VAO);
+	glGenBuffers(1, &world_VBO);
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindVertexArray(world_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, world_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle,
 			GL_STATIC_DRAW);
 
@@ -132,11 +134,11 @@ main(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
 		GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
 	stbi_image_free(data);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-	char *vertex_source, *fragment_source;
+	const char *vertex_source, *fragment_source;
 
 	vertex_source = file_to_str("shaders/world.vs");
 	fragment_source = file_to_str("shaders/world.fs");
@@ -149,10 +151,10 @@ main(void)
 	glShaderSource(fragment, 1, &fragment_source, NULL);
 	glCompileShader(fragment);
 
-	shader_program = glCreateProgram();
-	glAttachShader(shader_program, vertex);
-	glAttachShader(shader_program, fragment);
-	glLinkProgram(shader_program); 
+	world_shader = glCreateProgram();
+	glAttachShader(world_shader, vertex);
+	glAttachShader(world_shader, fragment);
+	glLinkProgram(world_shader); 
 
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
@@ -175,24 +177,13 @@ main(void)
 	file_to_str_cleanup(vertex_source);
 	file_to_str_cleanup(fragment_source);
 
-	vec3 positions[] = {
-		{ 0.0,  0.0,  0.0},
-		{ 2.0,  5.0, -15.0},
-		{-1.5, -2.2, -2.5},
-		{-3.8, -2.0, -12.3},
-		{ 2.4, -0.4, -3.5},
-		{-1.7,  3.0, -7.5},
-		{ 1.3, -2.0, -2.5},
-		{ 1.5,  2.0, -2.5},
-		{ 1.5,  0.2, -1.5},
-		{-1.3,  1.0, -1.5}
-	};
-
 	mat4 model, view, projection;
 
-	int model_loc = glGetUniformLocation(shader_program, "model");
-	int view_loc = glGetUniformLocation(shader_program, "view");
-	int projection_loc = glGetUniformLocation(shader_program, "projection");
+	int model_loc = glGetUniformLocation(world_shader, "model");
+	int view_loc = glGetUniformLocation(world_shader, "view");
+	int projection_loc = glGetUniformLocation(world_shader, "projection");
+
+	char frametime_str[50];
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(.2, .3, .3, 1);
@@ -207,33 +198,34 @@ main(void)
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		if(main_screen.screen_changed || zoom_changed) {
-			main_screen.screen_changed = false;
-			zoom_changed = false;
+		if(screen_changed || zoom_changed) {
+			glm_perspective(
+				glm_rad(main_camera.zoom),
+				(float)screen_size[0]/(float)screen_size[1],
+				.1, 100, projection
+			);
 
-			glm_perspective(glm_rad(main_camera.zoom),
-				(float)main_screen.size[0]/(float)main_screen.size[1], .1, 100, projection);
-			glUseProgram(shader_program);
+			glUseProgram(world_shader);
 			glUniformMatrix4fv(projection_loc, 1, GL_FALSE,
 				(float *)projection);
 			glUseProgram(0);
 
+			if (screen_changed)
+				text_rendering_perspective(
+					(vec2){screen_size[0], screen_size[1]},
+					&main_text
+				);
 
-			text_rendering_perspective(
-				(vec2){main_screen.size[0],
-					main_screen.size[1]},
-				&main_text
-			);
+			screen_changed = false;
+			zoom_changed = false;
 		}
 
-
-		glUseProgram(shader_program);
-		glBindVertexArray(VAO);
+		glUseProgram(world_shader);
+		glBindVertexArray(world_VAO);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		camera_getviewmatrix(view, &main_camera);
-		glUniformMatrix4fv(view_loc, 1, GL_FALSE,
-			(float *)view);
+		glUniformMatrix4fv(view_loc, 1, GL_FALSE, (float *)view);
 
 		for (short i = 0; i < sizeof(positions)/sizeof(vec3); ++i) {
 			glm_translate_make(model, positions[i]);
@@ -246,25 +238,31 @@ main(void)
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			glDrawArrays(GL_TRIANGLE_STRIP, 6, 8);
 		}
+
 		glUseProgram(0);
 		glBindVertexArray(0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		text_rendering_render("This is sample text", (vec2){25, 25}, 1,
-				(vec3){.5, .8, .2}, &main_text);
+		if (delta_time > top_time)
+			top_time = delta_time;
 
-		text_rendering_render("Mean3Voice-amid!!", (vec2){500, 700},
-				.75, (vec3){.8, .2, .5}, &main_text);
+		sprintf(frametime_str, "Frametime: %.2fms", delta_time*1000);
+		text_rendering_render(frametime_str, (vec2){15, 35}, 1,
+				(vec3){.9, .2, .2}, &main_text);
 
+		sprintf(frametime_str, "Top time: %.2fms", top_time*1000);
+		text_rendering_render(frametime_str, (vec2){15, 15}, 1,
+				(vec3){.9, .4, .4}, &main_text);
 		glfwSwapBuffers(window);
+
 		glfwPollEvents();
 	}
 
 	text_rendering_cleanup(&main_text);
 
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteProgram(shader_program);
+	glDeleteVertexArrays(1, &world_VAO);
+	glDeleteBuffers(1, &world_VBO);
+	glDeleteProgram(world_shader);
 
 	glfwTerminate();
 }

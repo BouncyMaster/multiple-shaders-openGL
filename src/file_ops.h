@@ -2,6 +2,6 @@
 #define FILE_OPS_H
 
 char *file_to_str(const char *file_path);
-void file_to_str_cleanup(char *buffer);
+void file_to_str_cleanup(const char *buffer);
 
 #endif

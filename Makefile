@@ -1,6 +1,7 @@
 LIBS = -lGL -lglfw -ldl -lm -lfreetype
 INCS = -Iexternal/glad/include -Iexternal/stb -I/usr/include/freetype2
-CFLAGS = -std=c99 -O2 -march=znver1 -Wall -Wno-char-subscripts
+CFLAGS = -std=c99 -O2 -march=znver1 -Wall -Wno-char-subscripts \
+	-Wdiscarded-qualifiers
 
 SRC = src/main.c src/file_ops.c src/text_rendering.c src/camera.c \
 	external/glad/src/glad.c
