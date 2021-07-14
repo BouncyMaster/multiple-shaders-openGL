@@ -2,8 +2,13 @@
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#include "world_data.h"
 #include "file_ops.h"
 #include "text_rendering.h"
+#include "camera.h"
 
 struct screen {
 	short size[2];
