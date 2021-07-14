@@ -1,5 +1,4 @@
 #include <glad/glad.h>
-#include <cglm/cglm.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H 
@@ -107,13 +106,13 @@ text_rendering_init(const char *vertex_shader_source,
 }
 
 void
-text_rendering_perspective(float x, float y, struct text_rendering *text)
+text_rendering_perspective(vec2 size, struct text_rendering *text)
 {
 	glUseProgram(text->shader_program);
 
 	mat4 projection;
 
-	glm_ortho(0, x, 0, y, 0, 1, projection);
+	glm_ortho(0, size[0], 0, size[1], 0, 1, projection);
 	glUniformMatrix4fv(text->projection_loc, 1, GL_FALSE,
 			(float *)projection);
 
@@ -121,18 +120,18 @@ text_rendering_perspective(float x, float y, struct text_rendering *text)
 }
 
 void
-text_rendering_render(const char *string, float x, float y, float scale,
-		float red, float green, float blue, struct text_rendering *text)
+text_rendering_render(const char *string, vec2 pos, float scale, vec3 color,
+		struct text_rendering *text)
 {
 	glUseProgram(text->shader_program);
 	glBindVertexArray(text->VAO);
 
-	glUniform3f(text->textcolor_loc, red, green, blue);
+	glUniform3f(text->textcolor_loc, color[0], color[1], color[2]);
 	while (*string) {
 		struct ft_character ch = text->characters[*string++];
 
-		float xpos = x + ch.bearing[0] * scale;
-		float ypos = y - (ch.size[1] - ch.bearing[1]) * scale;
+		float xpos = pos[0] + ch.bearing[0] * scale;
+		float ypos = pos[1] - (ch.size[1] - ch.bearing[1]) * scale;
 		float w = ch.size[0] * scale;
 		float h = ch.size[1] * scale;
 
@@ -147,7 +146,7 @@ text_rendering_render(const char *string, float x, float y, float scale,
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-		x += ch.advance * scale;
+		pos[0] += ch.advance * scale;
 	}
 
 	glBindVertexArray(0);

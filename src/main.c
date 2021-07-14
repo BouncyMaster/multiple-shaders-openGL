@@ -63,11 +63,11 @@ main(void)
 					(float)main_screen.size[1], &main_text);
 		}
 
-		text_rendering_render("This is sample text", 25, 25, 1,
-				.5, .8, .2, &main_text);
+		text_rendering_render("This is sample text", (vec2){25, 25}, 1,
+				(vec3){.5, .8, .2}, &main_text);
 
-		text_rendering_render("Mean3Voice-amid!!", 500, 700, .75,
-				.8, .2, .5, &main_text);
+		text_rendering_render("Mean3Voice-amid!!", (vec2){500, 700},
+				.75, (vec3){.8, .2, .5}, &main_text);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
