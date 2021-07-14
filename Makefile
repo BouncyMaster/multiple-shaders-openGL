@@ -2,7 +2,8 @@ LIBS = -lGL -lglfw -ldl -lm -lfreetype
 INCS = -Iexternal/glad/include -I/usr/include/freetype2
 CFLAGS = -std=c99 -O2 -march=znver1 -Wall -Wno-char-subscripts
 
-SRC = src/main.c src/file_ops.c src/text_rendering.c src/camera.c external/glad/src/glad.c
+SRC = src/main.c src/file_ops.c src/text_rendering.c src/camera.c \
+	external/glad/src/glad.c
 OBJ = $(SRC:.c=.o)
 
 multiple-shaders: $(OBJ)
@@ -11,7 +12,7 @@ multiple-shaders: $(OBJ)
 .c.o:
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
-src/main.o: src/world_data.h
+src/main.o: src/world_data.h src/file_ops.h
 src/file_ops.o: src/file_ops.h
 src/text_rendering.o: src/text_rendering.h
 src/camera.o: src/camera.h
