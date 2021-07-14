@@ -12,7 +12,7 @@ multiple-shaders: $(OBJ)
 .c.o:
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
-src/main.o: src/world_data.h src/file_ops.h
+src/main.o: src/world_data.h
 src/file_ops.o: src/file_ops.h
 src/text_rendering.o: src/text_rendering.h
 src/camera.o: src/camera.h
