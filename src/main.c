@@ -138,17 +138,17 @@ main(void)
 	stbi_image_free(data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	const char *vertex_source, *fragment_source;
+	char *vertex_source, *fragment_source;
 
 	vertex_source = file_to_str("shaders/world.vs");
 	fragment_source = file_to_str("shaders/world.fs");
 
 	unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vertex_source, NULL);
+	glShaderSource(vertex, 1, (const char **)&vertex_source, NULL);
 	glCompileShader(vertex);
 
 	unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fragment_source, NULL);
+	glShaderSource(fragment, 1, (const char **)&fragment_source, NULL);
 	glCompileShader(fragment);
 
 	world_shader = glCreateProgram();

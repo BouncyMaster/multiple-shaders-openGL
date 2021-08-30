@@ -25,7 +25,7 @@ file_to_str(const char *file_path)
 }
 
 void
-file_to_str_cleanup(const char *buffer)
+file_to_str_cleanup(char *buffer)
 {
 	free(buffer);
 }
