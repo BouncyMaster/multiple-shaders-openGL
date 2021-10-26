@@ -85,6 +85,7 @@ main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 
 	GLFWwindow* window = glfwCreateWindow(screen_size[0], screen_size[1],
 			"multiple-shaders", 0, 0);
@@ -186,7 +187,7 @@ main(void)
 	char frametime_str[50];
 
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(.2, .3, .3, 1);
+	glClearColor(.1, .1, .1, .3);
 
 	float current_frame;
 	while(!glfwWindowShouldClose(window)) {
