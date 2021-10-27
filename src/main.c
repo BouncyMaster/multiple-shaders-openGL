@@ -16,7 +16,8 @@ bool screen_changed = true;
 unsigned int world_VAO, world_VBO, world_shader;
 
 float delta_time, last_frame = 0, top_time = 0;
-bool mouse_first = true, zoom_changed = true;
+bool mouse_first = true, zoom_changed = true, is_windowed = true,
+	is_held = false;
 float mouse_last[2] = {400, 400}; // screen_size / 2
 
 struct camera main_camera;
@@ -52,6 +53,20 @@ keyboard_callback(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera_process_keyboard(RIGHT, delta_time,
 				&main_camera);
+
+	// set/unset fullscreen
+	if ((glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) && !is_held) {
+		is_held = true;
+		GLFWmonitor *monitor = NULL;
+		if (is_windowed)
+			monitor = glfwGetPrimaryMonitor();
+		
+		glfwSetWindowMonitor(window, monitor, 0, 0, 1600, 900,
+					GLFW_DONT_CARE);
+		is_windowed = !is_windowed;
+	} else if ((glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) && is_held)
+		is_held = false;
+
 }
 
 void
@@ -88,7 +103,7 @@ main(void)
 	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 
 	GLFWwindow* window = glfwCreateWindow(screen_size[0], screen_size[1],
-			"multiple-shaders", 0, 0);
+			"multiple-shaders", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
