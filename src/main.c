@@ -254,6 +254,7 @@ main(void)
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			glDrawArrays(GL_TRIANGLE_STRIP, 6, 8);
+			glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
 		}
 
 		glUseProgram(0);
