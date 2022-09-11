@@ -1,23 +1,23 @@
-LIBS = -lGL -lglfw -ldl -lm -lfreetype
-INCS = -Iexternal/glad/include -Iexternal/stb -I/usr/include/freetype2
-CFLAGS = -std=c99 -O3 -march=znver1 -Wall -Wno-char-subscripts
+LDFLAGS = -L/usr/local/lib -L/usr/X11R6/lib
+LIBS = -lglfw -lm -lfreetype
+INCS = -Iexternal/file_ops -Iexternal/glad/include -Iexternal/stb -I/usr/X11R6/include/freetype2 -I/usr/local/include
+CFLAGS = -std=c99 -O2 -march=native -Wall -Wno-char-subscripts
 
-SRC = src/main.c src/file_ops.c src/text_rendering.c src/camera.c \
+SRC = src/main.c external/file_ops/file_ops.c src/text_rendering.c src/camera.c \
 	external/glad/src/glad.c
-OBJ = $(SRC:.c=.o)
+OBJ = ${SRC:.c=.o}
 
-multiple-shaders: $(OBJ)
-	$(CC) $(OBJ) $(LIBS) -o $@
+multiple-shaders: ${OBJ}
+	${CC} ${OBJ} ${LDFLAGS} ${LIBS} -o $@
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
+	${CC} ${CFLAGS} ${INCS} -c $< -o $@
 
 src/main.o: src/world_data.h
-src/file_ops.o: src/file_ops.h
 src/text_rendering.o: src/text_rendering.h
 src/camera.o: src/camera.h
 
-gentags:
+tags:
 	ctags `find src -name "*.c" -or -name "*.h"`
 
 clean:

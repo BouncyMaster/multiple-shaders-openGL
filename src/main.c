@@ -5,8 +5,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <file_ops.h>
 #include "world_data.h"
-#include "file_ops.h"
 #include "text_rendering.h"
 #include "camera.h"
 
@@ -175,8 +175,8 @@ main(void)
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 
-	file_to_str_cleanup(vertex_source);
-	file_to_str_cleanup(fragment_source);
+	file_to_str_free(vertex_source);
+	file_to_str_free(fragment_source);
 
 	camera_init((vec3){0, 0, 3}, (vec3){0, 1, 0}, &main_camera);
 
@@ -186,12 +186,12 @@ main(void)
 	fragment_source = file_to_str("shaders/text-rendering.fs");
 	text_rendering_init(
 		vertex_source, fragment_source,
-		"/usr/share/fonts/liberation-fonts/LiberationSans-Regular.ttf",
+		"/usr/local/share/fonts/Liberation/LiberationSans-Regular.ttf",
 		&main_text
 	);
 
-	file_to_str_cleanup(vertex_source);
-	file_to_str_cleanup(fragment_source);
+	file_to_str_free(vertex_source);
+	file_to_str_free(fragment_source);
 
 	mat4 model, view, projection;
 
