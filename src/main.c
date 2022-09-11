@@ -200,11 +200,9 @@ main(void)
 	file_to_str_free(vertex_source);
 	file_to_str_free(fragment_source);
 
-	mat4 model, view, projection;
+	mat4 projection, model, view, pv, pvm;
 
-	int model_loc = glGetUniformLocation(world_shader, "model");
-	int view_loc = glGetUniformLocation(world_shader, "view");
-	int projection_loc = glGetUniformLocation(world_shader, "projection");
+	int pvm_loc = glGetUniformLocation(world_shader, "pvm");
 
 	char frametime_str[50];
 
@@ -222,22 +220,17 @@ main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if(screen_changed || zoom_changed) {
-			glm_perspective(
-				glm_rad(main_camera.zoom),
-				(float)screen_size[0]/(float)screen_size[1],
-				.1, 100, projection
-			);
-
-			glUseProgram(world_shader);
-			glUniformMatrix4fv(projection_loc, 1, GL_FALSE,
-				(float *)projection);
-			glUseProgram(0);
-
 			if (screen_changed)
 				text_rendering_perspective(
 					(vec2){screen_size[0], screen_size[1]},
 					&main_text
 				);
+
+			glm_perspective(
+				glm_rad(main_camera.zoom),
+				(float)screen_size[0]/(float)screen_size[1],
+				.1, 100, projection
+			);
 
 			screen_changed = false;
 			zoom_changed = false;
@@ -248,15 +241,16 @@ main(void)
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		camera_getviewmatrix(view, &main_camera);
-		glUniformMatrix4fv(view_loc, 1, GL_FALSE, (float *)view);
+		glm_mat4_mul(projection, view, pv);
 
 		for (short i = 0; i < sizeof(positions)/sizeof(vec3); ++i) {
 			glm_translate_make(model, positions[i]);
 			glm_rotate_y(model, cos(current_frame), model);
 			glm_rotate_x(model, glm_rad(20 * i), model);
 
-			glUniformMatrix4fv(model_loc, 1, GL_FALSE,
-				(float *)model);
+			glm_mat4_mul(pv, model, pvm);
+			glUniformMatrix4fv(pvm_loc, 1, GL_FALSE,
+				(float *)pvm);
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			glDrawArrays(GL_TRIANGLE_STRIP, 6, 8);
