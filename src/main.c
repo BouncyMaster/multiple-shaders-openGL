@@ -16,8 +16,7 @@ bool screen_changed = true;
 unsigned int world_VAO, world_VBO, world_shader;
 
 float delta_time, last_frame = 0, top_time = 0;
-bool mouse_first = true, zoom_changed = true, is_windowed = true,
-	is_held = false;
+bool mouse_first = true, zoom_changed = true, is_windowed = true;
 float mouse_last[2] = {400, 400}; // screen_size / 2
 
 struct camera main_camera;
@@ -34,13 +33,8 @@ framebuffer_size_callback(GLFWwindow *window, int w, int h)
 }
 
 void
-keyboard_callback(GLFWwindow* window)
+key_held(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		top_time = 0;
-
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera_process_keyboard(FORWARD, delta_time,
 				&main_camera);
@@ -53,20 +47,31 @@ keyboard_callback(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera_process_keyboard(RIGHT, delta_time,
 				&main_camera);
+}
 
-	// set/unset fullscreen
-	if ((glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) && !is_held) {
-		is_held = true;
-		GLFWmonitor *monitor = NULL;
-		if (is_windowed)
-			monitor = glfwGetPrimaryMonitor();
-		
-		glfwSetWindowMonitor(window, monitor, 0, 0, 1600, 900,
-					GLFW_DONT_CARE);
-		is_windowed = !is_windowed;
-	} else if ((glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) && is_held)
-		is_held = false;
+void
+key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS) {
+		switch (key) {
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, true);
+			break;
+		case GLFW_KEY_F:
+		{
+			GLFWmonitor *monitor = NULL;
+			if (is_windowed)
+				monitor = glfwGetPrimaryMonitor();
 
+			glfwSetWindowMonitor(window, monitor, 0, 0, 1600, 900,
+						GLFW_DONT_CARE);
+			is_windowed = !is_windowed;
+			break;
+		}
+		case GLFW_KEY_SPACE:
+			top_time = 0;
+		}
+	}
 }
 
 void
@@ -111,6 +116,8 @@ main(void)
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetKeyCallback(window, key_callback);
+
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glGenVertexArrays(1, &world_VAO);
@@ -206,7 +213,7 @@ main(void)
 
 	float current_frame;
 	while(!glfwWindowShouldClose(window)) {
-		keyboard_callback(window);
+		key_held(window);
 
 		current_frame = glfwGetTime();
 		delta_time = current_frame - last_frame;
