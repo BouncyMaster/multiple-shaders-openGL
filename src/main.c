@@ -32,7 +32,7 @@ framebuffer_size_callback(GLFWwindow *window, int w, int h)
 	screen_size[1] = h;
 }
 
-void
+inline void
 key_held(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
