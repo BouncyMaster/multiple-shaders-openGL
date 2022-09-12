@@ -137,8 +137,8 @@ text_rendering_render(const char *string, vec2 pos, float scale, vec3 color,
 
 		float vertices[4][4] = {
 			{ xpos + w, ypos + h,  1, 0 },
-			{ xpos + w, ypos,      1, 1 },
 			{ xpos,     ypos + h,  0, 0 },
+			{ xpos + w, ypos,      1, 1 },
 			{ xpos,     ypos,      0, 1 },
 		};
 

@@ -207,6 +207,7 @@ main(void)
 	char frametime_str[50];
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glClearColor(.1, .1, .1, .3);
 
 	float current_frame;
