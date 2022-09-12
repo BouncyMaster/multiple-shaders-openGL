@@ -1,7 +1,7 @@
 #include "camera.h"
 #include <math.h>
 
-void
+static void
 camera_updatevectors(struct camera *cam)
 {
 	vec3 front;
