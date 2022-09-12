@@ -29,7 +29,7 @@ const float triangle[] = {
 	-1, -1,  .2,	 0,  0
 };
 
-vec3 positions[] = {
+const vec3 positions[] = {
 	{ 0.0,  0.0,  0.0},
 	{ 2.0,  5.0, -15.0},
 	{-1.5, -2.2, -2.5},

@@ -245,7 +245,7 @@ main(void)
 		glm_mat4_mul(projection, view, pv);
 
 		for (short i = 0; i < sizeof(positions)/sizeof(vec3); ++i) {
-			glm_translate_make(model, positions[i]);
+			glm_translate_make(model, (float *)positions[i]);
 			glm_rotate_y(model, cos(current_frame), model);
 			glm_rotate_x(model, glm_rad(20 * i), model);
 
