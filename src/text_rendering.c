@@ -123,17 +123,20 @@ void
 text_rendering_render(const char *string, vec2 pos, float scale, vec3 color,
 		struct text_rendering *text)
 {
+	struct ft_character ch;
+	float xpos, ypos, w, h;
+
 	glUseProgram(text->shader_program);
 	glBindVertexArray(text->VAO);
 
 	glUniform3f(text->textcolor_loc, color[0], color[1], color[2]);
 	while (*string) {
-		struct ft_character ch = text->characters[*string++];
+		ch = text->characters[*string++];
 
-		float xpos = pos[0] + ch.bearing[0] * scale;
-		float ypos = pos[1] - (ch.size[1] - ch.bearing[1]) * scale;
-		float w = ch.size[0] * scale;
-		float h = ch.size[1] * scale;
+		xpos = pos[0] + ch.bearing[0] * scale;
+		ypos = pos[1] - (ch.size[1] - ch.bearing[1]) * scale;
+		w = ch.size[0] * scale;
+		h = ch.size[1] * scale;
 
 		float vertices[4][4] = {
 			{ xpos + w, ypos + h,  1, 0 },
