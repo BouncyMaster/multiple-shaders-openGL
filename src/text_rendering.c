@@ -125,6 +125,12 @@ text_rendering_render(const char *string, vec2 pos, float scale, vec3 color,
 {
 	struct ft_character ch;
 	float xpos, ypos, w, h;
+	float vertices[4][4] = {
+		{0, 0, 1, 0},
+		{0, 0, 0, 0},
+		{0, 0, 1, 1},
+		{0, 0, 0, 1}
+	};
 
 	glUseProgram(text->shader_program);
 	glBindVertexArray(text->VAO);
@@ -138,12 +144,17 @@ text_rendering_render(const char *string, vec2 pos, float scale, vec3 color,
 		w = ch.size[0] * scale;
 		h = ch.size[1] * scale;
 
-		float vertices[4][4] = {
-			{ xpos + w, ypos + h,  1, 0 },
-			{ xpos,     ypos + h,  0, 0 },
-			{ xpos + w, ypos,      1, 1 },
-			{ xpos,     ypos,      0, 1 },
-		};
+		vertices[0][0] = xpos + w;
+		vertices[0][1] = ypos + h;
+
+		vertices[1][0] = xpos;
+		vertices[1][1] = vertices[0][1];
+
+		vertices[2][0] = vertices[0][0];
+		vertices[2][1] = ypos;
+
+		vertices[3][0] = xpos;
+		vertices[3][1] = ypos;
 
 		glBindTexture(GL_TEXTURE_2D, ch.texture_id);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
