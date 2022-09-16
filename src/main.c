@@ -7,7 +7,7 @@
 
 #include <file_ops.h>
 #include "world_data.h"
-#include "text_rendering.h"
+#include "text.h"
 #include "camera.h"
 
 short screen_size[2] = {800, 800};
@@ -187,7 +187,7 @@ main(void)
 
 	camera_init((vec3){0, 0, 3}, (vec3){0, 1, 0}, &main_camera);
 
-	struct text_rendering main_text;
+	struct text main_text;
 
 	vertex_source = file_to_str("shaders/text-rendering.vs");
 	fragment_source = file_to_str("shaders/text-rendering.fs");
@@ -266,18 +266,18 @@ main(void)
 			top_time = delta_time;
 
 		sprintf(frametime_str, "Frametime: %.2fms", delta_time*1000);
-		text_rendering_render(frametime_str, (vec2){15, 35}, 1,
+		text_render(frametime_str, (vec2){15, 35}, 1,
 				(vec3){.9, .2, .2}, &main_text);
 
 		sprintf(frametime_str, "Top time: %.2fms", top_time*1000);
-		text_rendering_render(frametime_str, (vec2){15, 15}, 1,
+		text_render(frametime_str, (vec2){15, 15}, 1,
 				(vec3){.9, .4, .4}, &main_text);
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
 	}
 
-	text_rendering_cleanup(&main_text);
+	text_cleanup(&main_text);
 
 	glDeleteVertexArrays(1, &world_VAO);
 	glDeleteBuffers(1, &world_VBO);
