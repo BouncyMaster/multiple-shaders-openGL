@@ -6,7 +6,7 @@
 #include "text_rendering.h"
 
 void
-text_rendering_init(const char *vertex_shader_source,
+text_init(const char *vertex_shader_source,
 		const char *fragment_shader_source,
 		const char *font, struct text_rendering *dest)
 {
@@ -106,7 +106,7 @@ text_rendering_init(const char *vertex_shader_source,
 }
 
 void
-text_rendering_perspective(vec2 size, struct text_rendering *text)
+text_perspective(vec2 size, struct text_rendering *text)
 {
 	glUseProgram(text->shader_program);
 
@@ -120,7 +120,7 @@ text_rendering_perspective(vec2 size, struct text_rendering *text)
 }
 
 void
-text_rendering_render(const char *string, vec2 pos, float scale, vec3 color,
+text_render(const char *string, vec2 pos, float scale, vec3 color,
 		struct text_rendering *text)
 {
 	struct ft_character ch;
@@ -169,7 +169,7 @@ text_rendering_render(const char *string, vec2 pos, float scale, vec3 color,
 }
 
 void
-text_rendering_cleanup(struct text_rendering *text)
+text_cleanup(struct text_rendering *text)
 {
 	glDeleteVertexArrays(1, &(text->VAO));
 	glDeleteBuffers(1, &(text->VBO));
