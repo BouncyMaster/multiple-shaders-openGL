@@ -10,12 +10,11 @@
 #include "text.h"
 #include "camera.h"
 
+float top_time = 0;
+
 short screen_size[2] = {800, 800};
 bool screen_changed = true;
 
-unsigned int world_VAO, world_VBO, world_shader;
-
-float delta_time, last_frame = 0, top_time = 0;
 bool mouse_first = true, zoom_changed = true, is_windowed = true;
 float mouse_last[2] = {400, 400}; // screen_size / 2
 
@@ -30,23 +29,6 @@ framebuffer_size_callback(GLFWwindow *window, int w, int h)
 
 	screen_size[0] = w;
 	screen_size[1] = h;
-}
-
-static inline void
-key_held(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera_process_keyboard(FORWARD, delta_time,
-				&main_camera);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera_process_keyboard(BACKWARD, delta_time,
-				&main_camera);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera_process_keyboard(LEFT, delta_time,
-				&main_camera);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera_process_keyboard(RIGHT, delta_time,
-				&main_camera);
 }
 
 void
@@ -101,6 +83,10 @@ scroll_callback(GLFWwindow* window, double offsetX, double offsetY)
 int
 main(void)
 {
+	unsigned int world_VAO, world_VBO, world_shader, texture;
+	float delta_time, last_frame = 0;
+	struct text main_text;
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -138,7 +124,6 @@ main(void)
 
 	glBindVertexArray(0);
 
-	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	// set the texture wrapping parameters
@@ -149,6 +134,7 @@ main(void)
 			GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	{
 	int width, height, nr_channels;
 
 	unsigned char *data = stbi_load("data/wall.jpg", &width, &height,
@@ -159,6 +145,7 @@ main(void)
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(data);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	char *vertex_source, *fragment_source;
@@ -187,8 +174,6 @@ main(void)
 
 	camera_init((vec3){0, 0, 3}, (vec3){0, 1, 0}, &main_camera);
 
-	struct text main_text;
-
 	vertex_source = file_to_str("shaders/text-rendering.vs");
 	fragment_source = file_to_str("shaders/text-rendering.fs");
 	text_init(
@@ -199,6 +184,7 @@ main(void)
 
 	file_to_str_free(vertex_source);
 	file_to_str_free(fragment_source);
+	}
 
 	mat4 projection, model, view, pv, pvm;
 
@@ -212,7 +198,18 @@ main(void)
 
 	float current_frame;
 	while(!glfwWindowShouldClose(window)) {
-		key_held(window);
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			camera_process_keyboard(FORWARD, delta_time,
+					&main_camera);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			camera_process_keyboard(BACKWARD, delta_time,
+					&main_camera);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			camera_process_keyboard(LEFT, delta_time,
+					&main_camera);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			camera_process_keyboard(RIGHT, delta_time,
+					&main_camera);
 
 		current_frame = glfwGetTime();
 		delta_time = current_frame - last_frame;
