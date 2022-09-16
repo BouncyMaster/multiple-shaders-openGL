@@ -1,5 +1,5 @@
-#ifndef TEXT_RENDERING_H
-#define TEXT_RENDERING_H
+#ifndef TEXT_H
+#define TEXT_H
 
 #include <cglm/cglm.h>
 
@@ -21,13 +21,13 @@ struct text {
 
 void text_init(const char *vertex_shader_source,
 		const char *fragment_shader_source,
-		const char *font, struct text_rendering *dest);
+		const char *font, struct text *dest);
 
-void text_perspective(vec2 size, struct text_rendering *text);
+void text_perspective(vec2 size, struct text *Text);
 
 void text_render(const char *string, vec2 pos, float scale,
-		vec3 color, struct text_rendering *text);
+		vec3 color, struct text *Text);
 
-void text_cleanup(struct text_rendering *text);
+void text_cleanup(struct text *Text);
 
 #endif

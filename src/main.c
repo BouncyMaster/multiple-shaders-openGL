@@ -191,7 +191,7 @@ main(void)
 
 	vertex_source = file_to_str("shaders/text-rendering.vs");
 	fragment_source = file_to_str("shaders/text-rendering.fs");
-	text_rendering_init(
+	text_init(
 		vertex_source, fragment_source,
 		"/usr/local/share/fonts/Liberation/LiberationSans-Regular.ttf",
 		&main_text
@@ -222,7 +222,7 @@ main(void)
 
 		if(screen_changed || zoom_changed) {
 			if (screen_changed)
-				text_rendering_perspective(
+				text_perspective(
 					(vec2){screen_size[0], screen_size[1]},
 					&main_text
 				);

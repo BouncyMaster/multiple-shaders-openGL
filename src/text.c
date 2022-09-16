@@ -3,12 +3,12 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H 
 
-#include "text_rendering.h"
+#include "text.h"
 
 void
 text_init(const char *vertex_shader_source,
 		const char *fragment_shader_source,
-		const char *font, struct text_rendering *dest)
+		const char *font, struct text *dest)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -106,14 +106,14 @@ text_init(const char *vertex_shader_source,
 }
 
 void
-text_perspective(vec2 size, struct text_rendering *text)
+text_perspective(vec2 size, struct text *Text)
 {
-	glUseProgram(text->shader_program);
+	glUseProgram(Text->shader_program);
 
 	mat4 projection;
 
 	glm_ortho(0, size[0], 0, size[1], 0, 1, projection);
-	glUniformMatrix4fv(text->projection_loc, 1, GL_FALSE,
+	glUniformMatrix4fv(Text->projection_loc, 1, GL_FALSE,
 			(float *)projection);
 
 	glUseProgram(0);
@@ -121,7 +121,7 @@ text_perspective(vec2 size, struct text_rendering *text)
 
 void
 text_render(const char *string, vec2 pos, float scale, vec3 color,
-		struct text_rendering *text)
+		struct text *Text)
 {
 	struct ft_character ch;
 	float xpos, ypos, w, h;
@@ -132,12 +132,12 @@ text_render(const char *string, vec2 pos, float scale, vec3 color,
 		{0, 0, 0, 1}
 	};
 
-	glUseProgram(text->shader_program);
-	glBindVertexArray(text->VAO);
+	glUseProgram(Text->shader_program);
+	glBindVertexArray(Text->VAO);
 
-	glUniform3f(text->textcolor_loc, color[0], color[1], color[2]);
+	glUniform3f(Text->textcolor_loc, color[0], color[1], color[2]);
 	while (*string) {
-		ch = text->characters[*string++];
+		ch = Text->characters[*string++];
 
 		xpos = pos[0] + ch.bearing[0] * scale;
 		ypos = pos[1] - (ch.size[1] - ch.bearing[1]) * scale;
@@ -169,9 +169,9 @@ text_render(const char *string, vec2 pos, float scale, vec3 color,
 }
 
 void
-text_cleanup(struct text_rendering *text)
+text_cleanup(struct text *Text)
 {
-	glDeleteVertexArrays(1, &(text->VAO));
-	glDeleteBuffers(1, &(text->VBO));
-	glDeleteProgram(text->shader_program);
+	glDeleteVertexArrays(1, &(Text->VAO));
+	glDeleteBuffers(1, &(Text->VBO));
+	glDeleteProgram(Text->shader_program);
 }
